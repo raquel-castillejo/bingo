@@ -1,33 +1,18 @@
 // https://doriandesings.github.io/bingo-vanilla/
 
-/*
-LÓGICA
-======
-- ✅ generar los cartones
-    - ✅ función para los DOS cartones de jugadores 
-    - ✅ función para generar 99 números
-    - ✅ función para el cartón de números
-
-- ✅ función que genere numeros aleatorios de 1 a 99 y los mete en un array
-- la función para si uno de los cartones se ha completado
-
-- con otra función recorres el array y
-    - los vas pintando en el cartón de 99 números
-    - compruebas si está en cada cartón y lo pintas
-*/
-
 // DOM
 // ===
 const playerOneElement = document.getElementById('player-1');
 const playerTwoElement = document.getElementById('player-2');
 const numbersCardElement = document.getElementById('numbers-cardboard');
+const bingoContainer = document.getElementById('bingo-container');
 const startButton = document.getElementById('start');
 
 // FUNCIONES
 // =========
 // random
 const randomNumber = max => {
-	return Math.floor(Math.random() * max);
+	return Math.floor(Math.random() * max + 1);
 };
 
 // generar números del 1 al 99
@@ -91,21 +76,11 @@ const printBingo = () => {
 	console.log(playerOneNumbers);
 	console.log(playerTwoNumbers);
 };
-
 printBingo();
 
 // selecciona un número aleatorio de la lista de números
 const selectNumber = numbersList =>
 	numbersList[randomNumber(numbersList.length)];
-
-// comprobar si ha ganado alguien
-const isWinner = player => {
-	const playerCardNumbers = [...player.children];
-	const winner = playerCardNumbers.every(number =>
-		number.classList.contains('check')
-	);
-	return winner;
-};
 
 // pintar números sacados en el bingo
 const paintBingoNumbers = numberToPaint => {
@@ -124,23 +99,48 @@ const pickBingoNumber = () => {
 	numbersToPlay.splice(selectedNumberIndex, 1);
 
 	paintBingoNumbers(selectedNumber);
+	return selectedNumber;
+};
+
+// comprobar si ha ganado alguien
+const isWinner = player => {
+	const playerCardNumbers = [...player.children];
+	const winner = playerCardNumbers.every(number =>
+		number.classList.contains('check')
+	);
+	return winner;
+};
+
+// imprimir ganador
+const printWinnerLoser = (winner, loser) => {
+	const winnerTxt = document.createElement('span');
+	winnerTxt.textContent = `Winner`;
+	winner.append(winnerTxt);
+
+	const loserTxt = document.createElement('span');
+	loserTxt.textContent = `Loser`;
+	loser.append(loserTxt);
 };
 
 // juego
 const startGame = () => {
+	const whatNumber = document.createElement('span');
+	bingoContainer.append(whatNumber);
+	startButton.remove();
+
 	const pickingNumbers = setInterval(() => {
-		pickBingoNumber();
+		whatNumber.textContent = `Número: ${pickBingoNumber()}`;
 
 		if (isWinner(playerOneElement)) {
 			clearInterval(pickingNumbers);
-			console.log('PLAYER ONE');
+			printWinnerLoser(playerOneElement, playerTwoElement);
 		}
 
 		if (isWinner(playerTwoElement)) {
 			clearInterval(pickingNumbers);
-			console.log('PLAYER TWO');
+			printWinnerLoser(playerTwoElement, playerOneElement);
 		}
-	}, 700);
+	}, 500);
 };
 
 // EVENTOS
