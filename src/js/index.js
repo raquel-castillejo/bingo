@@ -8,6 +8,12 @@ const numbersCardElement = document.getElementById('numbers-cardboard');
 const bingoContainer = document.getElementById('bingo-container');
 const startButton = document.getElementById('start');
 
+// final
+const whatNumber = document.createElement('span');
+const winnerTxt = document.createElement('span');
+const loserTxt = document.createElement('span');
+const restartButton = document.createElement('button');
+
 // FUNCIONES
 // =========
 // random
@@ -113,18 +119,18 @@ const isWinner = player => {
 
 // imprimir ganador
 const printWinnerLoser = (winner, loser) => {
-	const winnerTxt = document.createElement('span');
 	winnerTxt.textContent = `Winner`;
 	winner.append(winnerTxt);
 
-	const loserTxt = document.createElement('span');
 	loserTxt.textContent = `Loser`;
 	loser.append(loserTxt);
+
+	restartButton.textContent = 'restart';
+	bingoContainer.append(restartButton);
 };
 
 // juego
 const startGame = () => {
-	const whatNumber = document.createElement('span');
 	bingoContainer.append(whatNumber);
 	startButton.remove();
 
@@ -143,6 +149,14 @@ const startGame = () => {
 	}, 500);
 };
 
+// reiniciar el juego
+const restartGame = () => {
+	// tiene que borrar las clases check de todos los números
+	// tiene que rehacerse el array de números totales del bingo
+	// llamar a la función startGame
+};
+
 // EVENTOS
 // =======
 startButton.addEventListener('click', startGame);
+restartButton.addEventListener('click', restartGame);
