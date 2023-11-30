@@ -17,8 +17,8 @@ const restartButton = document.createElement('button');
 // FUNCIONES
 // =========
 // random
-const randomNumber = max => {
-	return Math.floor(Math.random() * max + 1);
+const randomNumber = (min, max) => {
+	return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 // generar números del 1 al 99
@@ -32,7 +32,7 @@ const printNumbersCardboard = numbersToPlay => {
 
 	numbersToPlay.forEach(number => {
 		const numberElement = document.createElement('span');
-		numberElement.classList.add('cell');
+		numberElement.classList.add('numbers-card__cell');
 		numberElement.dataset.number = number;
 		numberElement.textContent = number;
 		fragment.append(numberElement);
@@ -46,7 +46,7 @@ const generatePlayerNumbers = () => {
 	const numbersArr = [];
 
 	while (numbersArr.length < 15) {
-		const newNumber = randomNumber(99);
+		const newNumber = randomNumber(1, 99);
 		if (!numbersArr.includes(newNumber)) {
 			numbersArr.push(newNumber);
 		}
@@ -61,7 +61,7 @@ const printPlayerCard = playerCard => {
 
 	for (let index = 0; index < playerNumbers.length; index++) {
 		const newSpan = document.createElement('span');
-		newSpan.classList.add('cell-player');
+		newSpan.classList.add('player-card__cell');
 		newSpan.dataset.number = playerNumbers[index];
 		newSpan.textContent = playerNumbers[index];
 
@@ -86,7 +86,7 @@ printBingo();
 
 // selecciona un número aleatorio de la lista de números
 const selectNumber = numbersList =>
-	numbersList[randomNumber(numbersList.length)];
+	numbersList[randomNumber(0, numbersList.length - 1)];
 
 // pintar números sacados en el bingo
 const paintBingoNumbers = numberToPaint => {
@@ -94,7 +94,11 @@ const paintBingoNumbers = numberToPaint => {
 		`span[data-number='${numberToPaint}']`
 	);
 	elements.forEach(element => {
-		element.classList.add('check');
+		if (element.parentElement.id === 'numbers-cardboard') {
+			element.classList.add('numbers-card__cell--check');
+		} else {
+			element.classList.add('player-card__cell--check');
+		}
 	});
 };
 
@@ -110,32 +114,44 @@ const pickBingoNumber = () => {
 
 // comprobar si ha ganado alguien
 const isWinner = player => {
+	/*
 	const playerCardNumbers = [...player.children];
 	const winner = playerCardNumbers.every(number =>
-		number.classList.contains('check')
+		number.classList.contains("check")
 	);
-	return winner;
+	*/
+
+	const checked = player.querySelectorAll('span[class$="--check"]');
+
+	if (checked.length === 15) {
+		return player;
+	}
 };
 
 // imprimir ganador
 const printWinnerLoser = (winner, loser) => {
 	winnerTxt.textContent = `Winner`;
+	winnerTxt.classList.add('player-card__result');
 	winner.append(winnerTxt);
 
 	loserTxt.textContent = `Loser`;
+	loserTxt.classList.add('player-card__result');
 	loser.append(loserTxt);
 
 	restartButton.textContent = 'restart';
+	restartButton.classList.add('bingo__restart');
 	bingoContainer.append(restartButton);
 };
 
 // juego
 const startGame = () => {
 	bingoContainer.append(whatNumber);
+	whatNumber.classList.add('bingo__number');
 	startButton.remove();
 
 	const pickingNumbers = setInterval(() => {
-		whatNumber.textContent = `Número: ${pickBingoNumber()}`;
+		whatNumber.textContent = `Number: ${pickBingoNumber()}`;
+		console.log(numbersToPlay);
 
 		if (isWinner(playerOneElement)) {
 			clearInterval(pickingNumbers);
@@ -151,9 +167,17 @@ const startGame = () => {
 
 // reiniciar el juego
 const restartGame = () => {
-	// tiene que borrar las clases check de todos los números
-	// tiene que rehacerse el array de números totales del bingo
-	// llamar a la función startGame
+	restartButton.remove();
+	playerOneElement.textContent = '';
+	playerTwoElement.textContent = '';
+	numbersCardElement.textContent = '';
+
+	numbersToPlay = Array(99)
+		.fill()
+		.map((_, index) => index + 1);
+	printBingo();
+
+	startGame();
 };
 
 // EVENTOS
